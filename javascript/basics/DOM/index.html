@@ -55,32 +55,36 @@
             <h4 id="recompensas" class="block text-green-600 font-bold mb-2">R$ 0,00</h4>
         </p>
         
-        <form id="form-juros" class="flex justify-center">
+        <form id="form-juros" class="flex flex-col justify-center">
             <p class="mb-4">
                 <label for="numero-de-anos" class="block text-gray-800 text-sm font-bold">Quer saber quanto terá em X anos?</label>
                 <input id="numero-de-anos" type="number" required placeholder="numero de anos " class="w-full py-2 px-3 text-gray-700 leading-tight border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             </p>
+            
+                
             <button
             type="submit" 
             id="quanto-terei"
-            class="bg-blue-200 hover:bg-blue-800 text-white hover:text-white transition 
-                    duration-200 p-3 rounded-lg"
-                    >Quanto terei?</button>
+            class="bg-blue-400 hover:bg-blue-800 text-white hover:text-white transition 
+            duration-200 p-3 rounded-lg"
+            >Quanto terei?</button>
+               
+           
         </form>
 
     </section>
 
     <section id="detalhes-investimento" class="hidden bg-white rounded-lg shadow-md p-8 m-4">
 
-        <p>
-            <h3>
-                Você aportaria R$ <span id="valor-total-aportado">0,00</span> no total
+        <p class="flex justify-center bg-gray-200 ">
+            <h3 class="block text-gray-600 font-bold mb-6">
+                Você aportaria R$ <span class="block text-blue-600 font-bold" id="valor-total-aportado">0,00</span> no total
             </h3>
-            <h3>
-                Somente de juros, renderiam R$ <span id="total-juros">0,00</span> no total
+            <h3 class="block text-gray-600 font-bold mb-6">
+                Somente de juros, renderiam R$ <span class="block text-yellow-600 font-bold" id="total-juros">0,00</span> no total
             </h3>
-            <h3>
-                Ou seja, em <span id="anos-de-aporte">5</span> anos você teria R$ <span id="valor-total">0,00</span>
+            <h3 class="block text-gray-600 font-bold mb-8">
+                Ou seja, em <span id="anos-de-aporte" class="block text-gray-600 font-bold">5</span> anos você teria R$ <span class="block text-green-600 font-bold" id="valor-total">0,00</span>
             </h3>
         </p>
 
