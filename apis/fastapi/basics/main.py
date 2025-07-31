@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 from passlib.context import CryptContext
+from settings import Settings
+
+secret_key = Settings.SECRET_KEY
 
 app = FastAPI()
 # para rodar o código insira no terminal:
@@ -16,6 +19,8 @@ app = FastAPI()
 
 # a maioria das REST Apis não usam put nem delete, muitas englobam essas
 # funcionalidades no Post
+
+bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated = "auto")
 
 
 # Importando os roteadores das rotas (lembrar de importar depois da inicialização do app 

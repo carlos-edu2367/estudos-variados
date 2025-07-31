@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends
 from dependecies import pegar_sessao
 from models import Usuario
+from main import bcrypt_context
+
 
 
 
@@ -15,7 +17,8 @@ auth_router = APIRouter(prefix="/auth", tags=["auth"])
 async def login(email: str, senha: str, session = Depends(pegar_sessao)):
     resposta = session.query(Usuario).filter(Usuario.email == email).first()
     if resposta:
-        if senha == resposta.senha:
+        senha_hash = bcrypt_context.hash(senha)
+        if senha_hash == resposta.senha:
             return {"id": resposta.id}
         else:
             return {"erro": "Senha incorreta"}
@@ -38,7 +41,8 @@ async def cadastro( email:str, senha:str, nome:str, session = Depends(pegar_sess
         # ja existe um usuario cadastrado com esse e-mail
         return {"mensagem": "E-mail já cadastrado"}
     else:
-        novoUsuario = Usuario(nome, email, senha) # deve ser na ordem do init
+        senha_criptografada = bcrypt_context.hash(senha)
+        novoUsuario = Usuario(nome, email, senha_criptografada) # deve ser na ordem do init
         session.add(novoUsuario)
         session.commit()
         return {"mensagem": "Cadastro realizado"}
