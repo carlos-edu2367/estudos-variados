@@ -19,5 +19,11 @@ app = FastAPI()
 
 # Importando os roteadores das rotas (lembrar de importar depois da inicialização do app 
 # (app = FastAPI())
-from routes.auth_routes import auth_router
-from routes.order_routes import order_router
+from apis.fastapi.basics.routes.auth_routes import auth_router
+from apis.fastapi.basics.routes.order_routes import order_router
+
+# Depois de importar os roteadores precisamos avisar a Api que eles podem ser utilizados
+# ou seja, vamos incluí-los
+
+app.include_router(auth_router)
+app.include_router(order_router)

@@ -5,4 +5,4 @@ from fastapi import APIRouter
 # ex: criei a rota /login, ela na verdade é /order/login
 # E a "tags=" é só um titulo de organização da documentação da api
 # Para que as rotas que criarmos aqui ficarem organizadas em order na documentação
-order_router = APIRouter(prefix="order", tags="order")
+order_router = APIRouter(prefix="/order", tags="order")
