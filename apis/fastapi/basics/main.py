@@ -1,8 +1,9 @@
 from fastapi import FastAPI
+from passlib.context import CryptContext
 
 app = FastAPI()
 # para rodar o código insira no terminal:
-# python -m uvicorn apis.fastapi.basics.main:app --reload (o caminho:app e o --reload)
+# python -m uvicorn main:app --reload (o caminho:app e o --reload)
 
 # endpoint:
 # /nomedarota
@@ -19,8 +20,8 @@ app = FastAPI()
 
 # Importando os roteadores das rotas (lembrar de importar depois da inicialização do app 
 # (app = FastAPI())
-from apis.fastapi.basics.routes.auth_routes import auth_router
-from apis.fastapi.basics.routes.order_routes import order_router
+from routes.auth_routes import auth_router
+from routes.order_routes import order_router
 
 # Depois de importar os roteadores precisamos avisar a Api que eles podem ser utilizados
 # ou seja, vamos incluí-los

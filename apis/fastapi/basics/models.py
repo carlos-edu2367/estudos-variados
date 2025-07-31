@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, Column, String, Integer, Boolean, Float, ForeignKey
 from sqlalchemy.orm import declarative_base
-from sqlalchemy_utils.types import ChoiceType # para definir valores possiveis para
+#from sqlalchemy_utils.types import ChoiceType # para definir valores possiveis para
 # determinadas colunas (coluna tipo só pode ter admin e cliente, coisa do tipo)
 
 # Cria a conexão com o banco de dados
@@ -42,17 +42,20 @@ class Pedido(Base):
 # Estamos definindo a tupla de tuplas com as opções de status dos pedidos
 # Não sei pq, mas o sqlalchemy não aceita dicionários nisso, então faz com tupla
 # É uma boa prática de padronização, apesar de ser possível padronizar de outras formas
-    STATUS_PEDIDOS = (
-        ("PENDENTE", "PENDENTE"),
-        ("CANCELADO", "CANCELADO"),
-        ("FINALIZADO", "FINALIZADO")
-    ) 
+    # STATUS_PEDIDOS = (
+    #     ("PENDENTE", "PENDENTE"),
+    #     ("CANCELADO", "CANCELADO"),
+    #     ("FINALIZADO", "FINALIZADO")
+    # ) 
+
+# Masss, essa parte inteira esta comentada pq estamos usando o Alembic para gerenciar versoes
+# do banco de dados, e o alembic não gosta muito dos utils do sqlalchemy
 
     id = Column("id", Integer, primary_key=True, autoincrement=True)
-    status = Column("status", ChoiceType(choices=STATUS_PEDIDOS)) # PENDENTE, CANCELADO, FINALIZADO
+    status = Column("status", String) # PENDENTE, CANCELADO, FINALIZADO
     usuario = Column("usuario", ForeignKey("usuarios.id"))
     preco = Column("preco", Float)
-    #itens = 
+    #itens = (futuro)
 
     def __init__(self, usuario, status="PENDENTE", preco=0):
         self.usuario = usuario
@@ -76,3 +79,14 @@ class ItemPedido(Base):
         self.tamanho = tamanho
         self.preco_unitario = preco_unitario
         self.pedido = pedido
+
+
+
+
+# depois de configurar o alembic podemos começar a criar/migrar o banco de dados
+
+# Para criar ou migrar o banco com alembic devemos rodar isso no terminal:
+# alembic revision --autogenerate -m "detalhar a migração tipo commit do git" 
+# para fazer tipo o commit do banco
+# alembic upgrade head
+# para dar o push

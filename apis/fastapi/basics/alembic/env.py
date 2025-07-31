@@ -3,6 +3,18 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
+# Pra funcionar tem que conseguir importar a clase Base do models
+# Mas ela está em um nivel de pastas mais baixo que esse env.py
+# ou seja, precisamos usar OS e Sys
+
+import os
+import sys
+
+# Aí tem que fazer essa macumba aqui inteira pra ele reconhecer todos os arquivos
+# da pasta raíz do codigo kkkkkk
+# nem tenta decorar, só saiba que essa é a forma de se fazer
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from alembic import context
 
 # this is the Alembic Config object, which provides
@@ -18,7 +30,9 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = None
+
+from models import Base
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
