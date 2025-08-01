@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from dependecies import pegar_sessao
 from models import Usuario
 from main import bcrypt_context
+from schemas import UsuarioSchema
+from sqlalchemy.orm import Session
 
 
 
@@ -13,33 +15,21 @@ from main import bcrypt_context
 # Para que as rotas que criarmos aqui ficarem organizadas em auth na documentação
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
-@auth_router.get("/login/{email}/{senha}")
-async def login(email: str, senha: str, session = Depends(pegar_sessao)):
-    resposta = session.query(Usuario).filter(Usuario.email == email).first()
-    if resposta:
-        senha_hash = bcrypt_context.hash(senha)
-        if senha_hash == resposta.senha:
-            return {"id": resposta.id}
-        else:
-            return HTTPException(status_code=401, detail="Senha incorreta")
-    else:
-        return HTTPException(status_code=401, detail="E-mail não encontrado")
-
 # Destrinchando esta end point:
 # Primeiro como decorator (@ acima da função) nós setamos que é uma rota referente ao
-# Roteador, que é um endpoint do tipo get e que espera 2 variaveis (email e senha)
-# e depois criamos a função, que consome desses mesmos e-mail e senha
+# Roteador, que é um endpoint do tipo post e que espera 3 variaveis (nome, e-mail e senha)
+# e depois criamos a função, que consome desses mesmos nome, e-mail e senha
 # IMPORTANTE: devemos sempre passar o modelo de dados (schemas ou padrões)
 
 @auth_router.post("/cadastro")
-async def cadastro( email:str, senha:str, nome:str, session = Depends(pegar_sessao) ):
+async def cadastro( usuario_schema: UsuarioSchema, session: Session = Depends(pegar_sessao) ):
     """
     Esta rota espera receber as informações do usuário para realizar o cadastro
 
     Possiveis erros: 
     400 - E-mail já existe no banco de dados
     """
-    usuario = session.query(Usuario).filter(Usuario.email == email).first()
+    usuario = session.query(Usuario).filter(Usuario.email == usuario_schema.email).first()
     if usuario:
         # ja existe um usuario cadastrado com esse e-mail
         return HTTPException(status_code=400, detail="E-mail já cadastrado")
@@ -48,9 +38,9 @@ async def cadastro( email:str, senha:str, nome:str, session = Depends(pegar_sess
         # ou seja, caso algo de errado enviamos um status com codigo e detalhes do erro
         # Erros geralmente vão ser 400 ou 401
     else:
-        senha_criptografada = bcrypt_context.hash(senha)
-        novoUsuario = Usuario(nome, email, senha_criptografada) # deve ser na ordem do init
+        senha_criptografada = bcrypt_context.hash(usuario_schema.senha)
+        novoUsuario = Usuario(usuario_schema.nome, usuario_schema.email, senha_criptografada, usuario_schema.ativo, usuario_schema.admin) # deve ser na ordem do init
         session.add(novoUsuario)
         session.commit()
-        return {"mensagem": f"Cadastro realizado {email}"}
+        return {"mensagem": f"Cadastro realizado {usuario_schema.email}"}
 
