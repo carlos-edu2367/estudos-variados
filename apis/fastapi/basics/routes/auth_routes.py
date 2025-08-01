@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from dependecies import pegar_sessao
 from models import Usuario
 from main import bcrypt_context
-from schemas import UsuarioSchema
+from schemas import UsuarioSchema, LoginSchema
 from sqlalchemy.orm import Session
 
 
@@ -44,3 +44,53 @@ async def cadastro( usuario_schema: UsuarioSchema, session: Session = Depends(pe
         session.commit()
         return {"mensagem": f"Cadastro realizado {usuario_schema.email}"}
 
+# Com isso o cadastro está finalizado de forma segura, vou explicar o que foi feito em etapas:
+# 1- decorator com o roteador e o caminho da rota
+# 2- Definimos uma função assincrona de cadastro (função inteligente, a mágica do fastapi)
+    # uma função assíncrona faz o seguinte: 
+    # se enviarem 100 requisições para a api ela vai fazer quase que todas ao mesmo tempo
+    # usando o espaço de tempo de processamento de uma para iniciar outra
+    # EX: um endpoint precisa de uma api externa, em uma api com flask ou django
+    # todas as outras requisições ficariam em "espera" até essa retornar um resultado
+    # mas como o FASTApI é assincrono ele durante a espera realiza os outros
+    # assim nunca travando o servidor
+# 3- Definimos que a função espera receber uma classe que siga as regras do schema criado
+# 4- definimos a sessão dependente da sessão com fechamento automático em dependencies
+# 5- Fazemos uma query na classe usuarios, procurando se algum usuário já utiliza esse e-mail
+    # Se já existe
+        # Retorna um erro usando HTTPException, erro 400 com os detalhes
+    # Se não existe
+        # Iniciamos a criptografia da senha usando bcrypt
+        # instanciamos um novo usuario com as informações fornecidas
+        # damos um session.add para adicionar o usuario instanciado
+        # retornamos uma mensagem de sucesso (por padrão acompanhada do cod 200)
+
+
+# Agora vamos desenvolver o login
+@auth_router.post("/login")
+async def login(login_schema: LoginSchema, session: Session = Depends(pegar_sessao)):
+    """
+    Essa rota é responsável por gerenciar o login do usuário, Retorna um token JWT
+
+    Erros: 401 - Não autorizado, 400 - E-mail não cadastrado
+    """
+    # pegando usuario pelo e-mail
+    usuario = session.query(Usuario).filter(Usuario.email == login_schema.email).first()
+
+    # Verificando se algum usuario foi localizado
+    if usuario:
+        # Existe usuario com esse e-mail
+
+        # Verificando se a senha está correta
+        senha_correta = bcrypt_context.verify(login_schema.senha, usuario.senha)
+
+        if senha_correta:
+            # Senha correta
+            return {"mensagem": "Senha correta"}
+        
+        else:
+            #senha incorreta
+            return HTTPException(status_code=400, detail="Não autorizado")
+    else:
+        # Não existe um usuário com esse e-mail
+        return HTTPException(status_code=400, detail="Usuário não existe")

@@ -20,3 +20,10 @@ class UsuarioSchema(BaseModel):
     # Primeiro definimos o Schema (o modelo de dados)
     # depois configuramos esse modelo de dados para ser tratado como ORM no sqlalchemy
     # por isso definimos from_attributes = True
+
+class LoginSchema(BaseModel):
+    email: str
+    senha: str
+    
+    class Config:
+        from_attributes = True
