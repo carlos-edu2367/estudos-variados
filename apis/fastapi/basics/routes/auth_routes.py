@@ -32,7 +32,8 @@ async def cadastro( usuario_schema: UsuarioSchema, session: Session = Depends(pe
     usuario = session.query(Usuario).filter(Usuario.email == usuario_schema.email).first()
     if usuario:
         # ja existe um usuario cadastrado com esse e-mail
-        return HTTPException(status_code=400, detail="E-mail já cadastrado")
+        raise HTTPException(status_code=400, detail="E-mail já cadastrado") 
+        # raise é pra retornar erros
     
         # utilizamos o HTTPException para enviar um status de erro para api
         # ou seja, caso algo de errado enviamos um status com codigo e detalhes do erro
@@ -65,6 +66,13 @@ async def cadastro( usuario_schema: UsuarioSchema, session: Session = Depends(pe
         # damos um session.add para adicionar o usuario instanciado
         # retornamos uma mensagem de sucesso (por padrão acompanhada do cod 200)
 
+# Agora precisamos criar a função de criar os tokens jwt
+
+def criar_token(id_usuario):
+    return f"klsd989w23eydsqjd8e37und{id_usuario}"
+# vamos desenvolver essa função da forma certa logo
+
+
 
 # Agora vamos desenvolver o login
 @auth_router.post("/login")
@@ -86,11 +94,14 @@ async def login(login_schema: LoginSchema, session: Session = Depends(pegar_sess
 
         if senha_correta:
             # Senha correta
-            return {"mensagem": "Senha correta"}
+            return {
+                "acess_token": criar_token(usuario.id),
+                "toker_type": "Bearer"
+            }
         
         else:
             #senha incorreta
-            return HTTPException(status_code=400, detail="Não autorizado")
+            raise HTTPException(status_code=400, detail="Não autorizado")
     else:
         # Não existe um usuário com esse e-mail
-        return HTTPException(status_code=400, detail="Usuário não existe")
+        raise HTTPException(status_code=400, detail="Usuário não existe")
